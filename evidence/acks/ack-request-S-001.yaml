@@ -4,11 +4,11 @@ status: unsigned
 schema: rhoai3.ack-request/v1
 story_id: S-001
 task_id: t_b46de460
-created_at: 2026-08-13T22:23:46Z
+created_at: 2026-08-13T22:25:02Z
 artifact_refs:
   - story_id: S-001
   - path: evidence/bodies/m3-s-001.json
-    sha256: de71aca54f85e969ec185db6da1265423bb0d23a95a1eae39c27a2e0d988a687
+    sha256: 1f3f2e48bb57b8970621718ff111898163d380514c1e28990cdefccb5db42047
   - path: evidence/briefs/partition.json
     sha256: fef88fd83d6d2607f67a62428f8c0ddcf992c59c7dd749c2470429756b703019
-notes: "Lead D1 E-20260813T222125Z regenerate after L6 remint-in-place; Architect E-155332Z Class A atomic digests; Operator signs brief-identity (no hand-copied digests)"
+notes: "Lead D4 drop src/pom.xml + D1 regen; Operator signs brief-identity"

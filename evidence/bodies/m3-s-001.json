@@ -1,0 +1,69 @@
+{
+  "task_id": "pending",
+  "role": "implementing",
+  "phase": "M3",
+  "identity": {
+    "story_id": "S-001",
+    "transform_class": "CONFIG",
+    "g2_applicability": "not_applicable",
+    "operand_count": 2,
+    "sizing_basis": "operand_count",
+    "operand_class": "build_config"
+  },
+  "refs": [
+    {
+      "key": "brief_identity_ack",
+      "path": "evidence/acks/brief-identity-S-001.ack.yaml",
+      "sha256": "pending"
+    },
+    {
+      "key": "legacy_locus",
+      "path": "/projects/.derived/legacy-at-3/pom.xml",
+      "sha256": "3107a5d3466ca4e4fd434925f509728bb83c4a7543e500ab1eea2dd9f7b027a5"
+    },
+    {
+      "key": "destination_inventory",
+      "path": "evidence/receipts/destination-inventory/S-001.json",
+      "sha256": "1965f8fb781d78e507a5651c504841f0736427a6f25640fb232b889ba8464a5d"
+    }
+  ],
+  "files_in_scope": [
+    "pom.xml",
+    "/projects/modernized/pom.xml",
+    "/projects/.derived/legacy-at-3/pom.xml"
+  ],
+  "files_writable": [
+    "/projects/modernized/pom.xml"
+  ],
+  "exit_criteria": [
+    {
+      "check": "quarkus_compile",
+      "cmd": "export JAVA_HOME=\"${JAVA_HOME_21}\" && export PATH=\"${JAVA_HOME}/bin:${PATH}\" && mvn -q clean compile",
+      "expect": "rc=0"
+    },
+    {
+      "check": "pom_quarkus_bom",
+      "cmd": "grep -E 'quarkus-bom|quarkus-universe-bom' pom.xml | head -1 | grep -q .",
+      "expect": "rc=0",
+      "assert": "POM imports a Quarkus BOM"
+    }
+  ],
+  "rules": [
+    "javaee-pom-to-quarkus-00010",
+    "javaee-pom-to-quarkus-00020",
+    "javaee-pom-to-quarkus-00030",
+    "javaee-pom-to-quarkus-00040",
+    "javaee-pom-to-quarkus-00050",
+    "javaee-pom-to-quarkus-00060",
+    "springboot-parent-pom-to-quarkus-00000",
+    "springboot-plugins-to-quarkus-0000"
+  ],
+  "layer": "foundation",
+  "dependencies": [],
+  "constraints": [
+    "FORBIDDEN API: do not use @IfBuildProfile (any profile). Required path: %profile config / build-time alternatives per skill_view references/di-config.md (Pre-v12 R5 / Architect E-20260811T102405Z). Silent adoption after quoting this forbid = execute-as-defined FAIL/abort.",
+    "WRITE-SET (AR-4.4): write only files_writable / destination write-set. Readable deps and OOS paths are not write authority. Silent OOS writes = FAIL/abort.",
+    "COVERAGE-GAP: orphan model/interface / missing dependency owner \u21d2 typed needs_input BLOCK (escalate Lead) \u2014 NEVER OOS-invent types or owners.",
+    "BUILD_CONFIG: edit only declared properties/config operands; do not expand into src_code without typed needs_input / Lead rescope."
+  ]
+}
