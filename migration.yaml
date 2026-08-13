@@ -1,0 +1,52 @@
+# Migration provenance + harness contract — stamped by the app-migration
+# template. Specimen-layering: the golden scaffold stays specimen-free; this
+# skeleton is the only place demo-specimen contracts are written.
+#
+# Profile selection is by legacyRepoUrl (known demo freeze-forks). Unknown
+# URLs get provenance + analysis only and contract.status: undecided — never
+# Coolstore cart literals. Do not "edit after create" for the two demo
+# specimens; recreate from the template if the stamp is wrong.migration:
+  legacyRepoUrl: https://github.com/adnan-drina/spring-petclinic-rest-legacy
+  target: quarkus
+  provisionedBy: app-migration golden-path template
+  needsDatabase: true
+  legacyPackage: org.springframework.samples.petclinic
+  targetPackage: com.demo
+acceptance:
+  # Validated showcase stamp (petclinic-rest-v5 / O-ACCEPTREAL).
+  path: /petclinic/api/vets
+  collection: _array
+  getter: getAllVets
+  service: VetRestController
+  itemType: VetDto
+  needsDatabase: true
+  idFields: [id]
+
+analysis:
+  # AD-003A: --target only, never --source. openjdk21 kept (O-OPENJDK21TARGET).
+  mode: source-only
+  targets:
+    - quarkus
+    - jakarta-ee9
+    - cloud-readiness
+    - openjdk17
+    - openjdk21
+targetContract:
+  validateInput: true
+  mapErrors: true
+  getIdempotent: true
+  threadSafeState: false
+  cacheRefreshGuard: true
+  normalizeBeforeDerive: false
+configTransforms:
+  - from: server.port
+    to: quarkus.http.port
+    valueMap:
+      "9966": "8080"
+preserve:
+  - petclinic.security.enable
+  - server.servlet.context-path
+forbidden: []
+contract:
+  status: decided
+  profile: spring-petclinic-rest-legacy

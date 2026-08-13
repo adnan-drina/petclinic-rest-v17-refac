@@ -1,0 +1,100 @@
+# Runtime for this project, applied by the shared pipeline's deploy task
+# after every green build (the task also pins the image to the platform's
+# resolved registry, so the default here is only a bootstrap value).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: petclinic-rest-v17-refac
+  labels:
+    app.kubernetes.io/name: petclinic-rest-v17-refac
+    app.kubernetes.io/part-of: petclinic-rest-v17-refac
+    app.openshift.io/runtime: quarkus
+    backstage.io/kubernetes-id: petclinic-rest-v17-refac
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: petclinic-rest-v17-refac
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: petclinic-rest-v17-refac
+        app.kubernetes.io/part-of: petclinic-rest-v17-refac
+        backstage.io/kubernetes-id: petclinic-rest-v17-refac
+    spec:
+      imagePullSecrets:
+        - name: quay-pull-secret
+      containers:
+        - name: petclinic-rest-v17-refac
+          # Bootstrap tag only — the deploy-app task pins each PipelineRun's
+          # immutable revision tag and sets IfNotPresent (V6 P4.1).
+          image: quay.io/rhoai3-coding-demo/petclinic-rest-v17-refac:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: QUARKUS_DATASOURCE_JDBC_URL
+              value: jdbc:postgresql://petclinic-rest-v17-refac-postgres:5432/petclinic-rest-v17-refac
+            - name: QUARKUS_DATASOURCE_USERNAME
+              valueFrom: {secretKeyRef: {name: petclinic-rest-v17-refac-postgres, key: POSTGRESQL_USER}}
+            - name: QUARKUS_DATASOURCE_PASSWORD
+              valueFrom: {secretKeyRef: {name: petclinic-rest-v17-refac-postgres, key: POSTGRESQL_PASSWORD}}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /q/health/live
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /q/health/ready
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: petclinic-rest-v17-refac
+  labels:
+    app.kubernetes.io/name: petclinic-rest-v17-refac
+    backstage.io/kubernetes-id: petclinic-rest-v17-refac
+spec:
+  selector:
+    app.kubernetes.io/name: petclinic-rest-v17-refac
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: petclinic-rest-v17-refac
+  labels:
+    app.kubernetes.io/name: petclinic-rest-v17-refac
+    backstage.io/kubernetes-id: petclinic-rest-v17-refac
+spec:
+  to:
+    kind: Service
+    name: petclinic-rest-v17-refac
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

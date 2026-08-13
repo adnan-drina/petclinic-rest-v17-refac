@@ -1,0 +1,162 @@
+# AD-H §15 + §16 — per-phase kanban_create dispatch seed.
+# Every M-phase task must set max_runtime_seconds from this file (native
+# recovery: SIGTERM + re-queue, outcome=timed_out). Do not omit.
+#
+# skills[] = declared preload / intended skill set (AD-H §16) — not Hermes RBAC.
+# One Kanban task ⇒ one task type (examining / planning / writing / checking).
+# Enforcement: SOUL + write-safe-root + acks + write-fence + lints.
+# Spec-kit /speckit-* skills live under ~/.hermes/skills (Path.home()); keep
+# that path on skills.external_dirs. Never include /speckit-implement.
+#
+# workspace_kind / workspace_path / body / parents / idempotency_key land
+# with the full phase schema (§15.3). Until then:
+#   - workspace_kind defaults to scratch — NEVER rely on it
+#   - every phase must eventually set workspace_kind: dir|worktree + absolute
+#     workspace_path to the migration repo
+#
+# Watchdog STUCK_SECONDS (observation, §15.2) must exceed max(budgets).
+# Role persona keys (role:/roles:/skills_by_role:) retired — Architect
+# E-20260813T144117Z / Operator E-20260813T143534Z.
+
+phases:
+  M1:
+    # ANALYZE — MTA/kantra + inventory + profile authoring
+    skills:
+      - derive-legacy-boot3
+      - scan-with-mta
+      - inventory-entry-points
+      - check-spec-readiness
+    max_runtime_seconds: 3600
+    requires_acks: []
+  M2:
+    # DEPRECATED monolithic PLAN — use M2a then M2b (R-AB.2 / pre-v12 R1).
+    # Kept for matrix/docs; dispatch-phase refuses bare M2.
+    # Wave B: enforce-authority-boundary is harness path-invoke only (not card-attach).
+    skills:
+      - check-spec-readiness
+    max_runtime_seconds: 3600
+    requires_acks:
+      - m1-findings
+  M2a:
+    # R-AB.2 / pre-v12 R1 — PLAN partition + briefs only (turn-volume cut)
+    # scan-with-mta attached so check-findings-handoff.py resolves via skill_view
+    # (Deputy E-20260811T112700Z — R1 split had omitted it).
+    # speckit-specify: Architect E-20260811T115316Z invoke-or-needs_input BIND
+    # provision-owns-tools (Architect E-20260811T121308Z): Spec Kit init is
+    # workspace provision / postStart — not an agent skill on M2a.
+    # Wave B: enforce-authority-boundary moved to .hermes/enforcement/ (path-invoke).
+    skills:
+      - check-spec-readiness
+      - scan-with-mta
+      - speckit-specify
+    max_runtime_seconds: 3600
+    requires_acks:
+      - m1-findings
+  M2b:
+    # R-AB.2 / pre-v12 R1 — SDD emit + create-m3 children (after M2a partition)
+    # Wave B: enforce-authority-boundary path-invoke only.
+    skills:
+      - check-spec-readiness
+      - scan-with-mta
+      # /speckit-specify|plan|tasks|analyze from ~/.hermes/skills (not implement)
+    max_runtime_seconds: 3600
+    requires_acks:
+      - m1-findings
+  M3:
+    # IMPLEMENT — per-unit transform
+    # Children MUST be created via
+    # .hermes/enforcement/dispatch-phase/scripts/create-m3-implementer.sh
+    # (bare hermes kanban create omits these skills — grounding study 20260809).
+    # AD-002F — useful = influence. M3 default preload is the workhorse + body lint
+    # only. Drop zero-touch (check-domain-parity→M4, enforce-authority-boundary/
+    # ground-in-harvest/record-run-evidence unread on S-001…S-006).
+    # Workers consult via skill_view; unused preloads need skills_unused (AD-002E).
+    #
+    # Architect E-20260813T152211Z / Lead wire-or-retire: do NOT re-attach
+    # ground-in-harvest or record-run-evidence to skills[] (opt-in ≠
+    # enforcement). They are harness-invoked on create (body digest /
+    # checkpoint) and on complete via assert-complete-exit-criteria.py
+    # (citation + body-digest + provenance). Physical move → .hermes/enforcement/
+    # at v14 mint with UPLIFT-6.
+    skills:
+      - check-spec-readiness
+      - spring-to-quarkus-patterns
+    # AD-H §18 required_checks (validator/sensor matrix)
+    required_checks:
+      - compile
+      - task_scoped_tests
+      - g2_if_harvest
+    max_runtime_seconds: 2700
+    requires_acks:
+      - m1-findings
+      - brief-identity
+  M4:
+    # VERIFY — verdict token PROVISIONAL_ACCEPT (AD-H §18.0). G-1 = volume+substance;
+    # g1_kill_ratio must be pending_threshold until threshold pinned (option A).
+    verdict_token: PROVISIONAL_ACCEPT
+    accept_kind: provisional
+    # AD-002G matrix: check-spec-readiness + check-domain-parity required; helpers allowed.
+    # Wave B: validate-contracts + enforce-authority-boundary are enforcement
+    # path-invoke only — never card-attach.
+    skills:
+      - check-spec-readiness
+      - check-domain-parity
+      - check-release-readiness
+    required_checks:
+      - mvn_clean_verify
+      - unit_it_contract
+      - sonar
+      - boot_health
+      - g1_characterization
+      - g2_if_harvest
+    max_runtime_seconds: 1800
+    requires_acks:
+      - m1-findings
+      - brief-identity
+  M5:
+    # CLOSE — full ACCEPT (G-4 closes G-1 residue). Kill-ratio PASS+pin or
+    # typed Operator waiver. G-4 fail after provisional → reopen that story.
+    # Standing entry-point descopes ⇒ SCOPED_ACCEPT only (check-accept-scope.py).
+    accept_kind: full
+    # AD-002G matrix: check-spec-readiness + check-domain-parity required; helpers allowed.
+    # Wave B: enforcement leaves path-invoke only.
+    skills:
+      - check-spec-readiness
+      - scan-with-mta
+      - check-domain-parity
+      - check-release-readiness
+    required_checks:
+      - preflight
+      - regression_suite
+      - sonar
+      - mta_rescan
+      - g3_findings_delta
+      - acceptance_live
+      - g4_runtime_parity
+      - accept_scope  # check-accept-scope.py — SCOPED_ACCEPT if descopes
+    max_runtime_seconds: 2400
+    requires_acks:
+      - m1-findings
+      - brief-identity
+  factory:
+    # Candidate SHA → factory green → promote that SHA (§16.3 / §18.1 / finding 4).
+    # must_not_contradict_m5_accept = full M5 ACCEPT only (§18.0).
+    # Provisional M4 / provisional-labeled M5 must refuse.
+    required_checks:
+      - compile
+      - unit_it_contract
+      - sonar
+      - security
+      - deploy_smoke
+      - must_not_contradict_m5_accept
+      - candidate_sha_then_promote
+
+
+watchdog:
+  # max(phases)=3600 + 600s grace for "still running after native recovery"
+  # Observation only (kanban-stuck-watchdog.py). Hard budget is a separate
+  # action layer — AD-009 §3 step 6:
+  #   python3 .hermes/home/scripts/enforce-max-runtime-hard.py --apply
+  # Silent exit typing — AD-009 §3.1:
+  #   python3 .hermes/home/scripts/apply-protocol-untyped-terminal.py --task-id t_… --block
+  stuck_seconds: 4200

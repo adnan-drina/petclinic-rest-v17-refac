@@ -1,0 +1,70 @@
+
+# Dev-grade PostgreSQL for the migrated service. Migrations off Java EE
+# monoliths land on a real datasource (Flyway schema + seed data), so the
+# runtime environment ships one: ephemeral storage, rebuilt on every start.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: petclinic-rest-v17-refac-postgres
+  labels:
+    app.kubernetes.io/part-of: petclinic-rest-v17-refac
+type: Opaque
+stringData:
+  # Dev-grade demo credentials; DATABASE matches the app name.
+  POSTGRESQL_USER: appuser
+  POSTGRESQL_PASSWORD: apppass
+  POSTGRESQL_DATABASE: petclinic-rest-v17-refac
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: petclinic-rest-v17-refac-postgres
+  labels:
+    app.kubernetes.io/part-of: petclinic-rest-v17-refac
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: petclinic-rest-v17-refac-postgres
+  template:
+    metadata:
+      labels:
+        app: petclinic-rest-v17-refac-postgres
+    spec:
+      containers:
+        - name: postgresql
+          image: registry.redhat.io/rhel9/postgresql-15:latest
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - secretRef:
+                name: petclinic-rest-v17-refac-postgres
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "coolstore", "-d", "petclinic-rest-v17-refac"]
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests: {cpu: 100m, memory: 256Mi}
+            limits: {memory: 512Mi}
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/pgsql/data
+      volumes:
+        - name: data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: petclinic-rest-v17-refac-postgres
+  labels:
+    app.kubernetes.io/part-of: petclinic-rest-v17-refac
+spec:
+  selector:
+    app: petclinic-rest-v17-refac-postgres
+  ports:
+    - port: 5432
+      targetPort: 5432
+
+
