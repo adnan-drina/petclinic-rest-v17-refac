@@ -345,6 +345,10 @@ if [[ "${_park_status}" == "ready" || "${_park_status}" == "todo" || "${_park_st
   die "PARK_AT_BIRTH: ${TASK_ID} status=${_park_status:-unknown} still dispatchable after create — refuse mint (governance/contracts/park-at-birth.md)"
 fi
 echo "PARK_AT_BIRTH=${TASK_ID} status=${_park_status}"
+# B6 nurse: parent-done may later auto-promote siblings; re-assert park for unsigned set.
+if [[ -x "${ROOT}/.hermes/enforcement/dispatch-phase/scripts/repark-m3-until-brief-ack.sh" ]]; then
+  bash "${ROOT}/.hermes/enforcement/dispatch-phase/scripts/repark-m3-until-brief-ack.sh"     --parent "${PARENT_PRIMARY}" >/dev/null 2>&1 || true
+fi
 # Operator E-20260811T114300Z — Review live adherence observation on every dispatch
 {
   echo "schema: rhoai3.review-adhere-observe-need/v1"

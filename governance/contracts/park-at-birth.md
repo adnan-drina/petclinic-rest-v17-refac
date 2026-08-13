@@ -23,3 +23,19 @@ cards during serial HOLD.
 
 - born-parked precedent
 - `slim-packet.md` M3 born-parked note
+
+## Parent-done auto-promote (B6)
+
+Native Hermes may flip parked M3 children to `ready` when the Planning parent
+reaches `done`. That undoes park-at-birth and lets `hermes kanban daemon`
+fan-out all stories in parallel before brief-identity acks exist.
+
+**Rule 5:** Immediately after M2b/`Planning` complete (and before any daemon
+tick), run:
+
+```bash
+bash .hermes/enforcement/dispatch-phase/scripts/repark-m3-until-brief-ack.sh \
+  --parent <m2b-task-id>
+```
+
+Unpark remains gate-driven: signed brief-identity ack + identity §3a + serial GO.

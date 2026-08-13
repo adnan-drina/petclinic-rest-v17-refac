@@ -1,0 +1,24 @@
+{
+  "schema": "rhoai3.operator-need/v1",
+  "ts": "2026-08-13T21:32:18Z",
+  "need": "Operator:sign-brief-identity-acks",
+  "detail": "Sign evidence/acks/ack-request-S-001.yaml .. S-013 into brief-identity-*.ack.yaml (13 unsigned). After S-001 only is signed + identity \u00a73a, Lead may serial-unpark S-001 only. Do not fan-out.",
+  "ack_requests": [
+    "evidence/acks/ack-request-S-001.yaml",
+    "evidence/acks/ack-request-S-002.yaml",
+    "evidence/acks/ack-request-S-003.yaml",
+    "evidence/acks/ack-request-S-004.yaml",
+    "evidence/acks/ack-request-S-005.yaml",
+    "evidence/acks/ack-request-S-006.yaml",
+    "evidence/acks/ack-request-S-007.yaml",
+    "evidence/acks/ack-request-S-008.yaml",
+    "evidence/acks/ack-request-S-009.yaml",
+    "evidence/acks/ack-request-S-010.yaml",
+    "evidence/acks/ack-request-S-011.yaml",
+    "evidence/acks/ack-request-S-012.yaml",
+    "evidence/acks/ack-request-S-013.yaml"
+  ],
+  "incident": "parallel_m3_fanout_repark",
+  "lead_reparked": true,
+  "daemon_stopped": true
+}
