@@ -25,14 +25,29 @@ EXIT_CODES = """Exit codes:
 """
 
 FAMILY_CHECKS: dict[str, frozenset[str]] = {
-    "create_fk": frozenset({"create_fk", "owner_pet_visit_create"}),
+    "create_fk": frozenset({"create_fk"}),  # F1: dropped specimen owner_pet_visit_create
     "route_contract": frozenset({"route_contract", "endpoint_contract"}),
     "hql_entity_path": frozenset({"hql_entity_path", "delete_cascade_it"}),
     "http_semantics": frozenset({"http_semantics", "exception_mapping"}),
     "tx_rmw": frozenset({"tx_rmw", "concurrency"}),
+    # Non-REST families (F1)
+    "build_resolves": frozenset({"build_resolves"}),
+    "config_profile_load": frozenset({"config_profile_load"}),
+    "test_suite_runs": frozenset({"test_suite_runs"}),
+    "log_output": frozenset({"log_output"}),
+    "cache_hit": frozenset({"cache_hit"}),
+    "health_probe": frozenset({"health_probe"}),
 }
 
 RESTISH = ("RestController", "Repository", "ApplicationService")
+
+from specimen_agnostic import (  # noqa: E402
+    COMPILE_ONLY,
+    is_oracle_unavailable,
+    normalize_operand_class,
+    oracle_unavailable_allowed_for_class,
+)
+
 
 
 def load_m3(root: Path) -> list[tuple[str, dict]]:
@@ -116,7 +131,44 @@ def main() -> int:
         families = identity.get("semantic_families") or identity.get("semanticFamilies")
         paths = " ".join(write_paths(body))
         restish = any(tok in paths for tok in RESTISH)
+        exits_pre = body.get("exit_criteria") or []
         if not families and not restish:
+            # Still enforce measurable non-compile exits (L2) even for non-REST bodies
+            for x in exits_pre if isinstance(exits_pre, list) else []:
+                if not isinstance(x, dict):
+                    continue
+                check = str(x.get("check") or "").strip()
+                if not check or check in COMPILE_ONLY:
+                    continue
+                # F5: oracle_unavailable needs reason, not cmd
+                if check == "oracle_unavailable":
+                    oclass = normalize_operand_class(body)
+                    if not oracle_unavailable_allowed_for_class(oclass):
+                        print(
+                            f"FAIL: AR-2.3–2.7 {label}: oracle_unavailable forbidden for "
+                            f"operand_class={oclass!r} (F5a E-20260813T221456Z)",
+                            file=sys.stderr,
+                        )
+                        bad = 1
+                    elif not is_oracle_unavailable(x):
+                        print(
+                            f"FAIL: AR-2.3–2.7 {label}: oracle_unavailable lacks reason "
+                            f"(E-20260813T220250Z F5)",
+                            file=sys.stderr,
+                        )
+                        bad = 1
+                    checked += 1
+                    continue
+                cmd = x.get("cmd")
+                if not (isinstance(cmd, str) and cmd.strip()):
+                    print(
+                        f"FAIL: AR-2.3–2.7 {label}: exit {check!r} has no cmd "
+                        f"(unmeasurable; add cmd, use oracle_unavailable+reason, or drop — "
+                        f"E-20260813T215058Z L2 / E-20260813T220250Z F5)",
+                        file=sys.stderr,
+                    )
+                    bad = 1
+                    checked += 1
             continue
         checked += 1
         if isinstance(families, str):
@@ -146,6 +198,42 @@ def main() -> int:
                 file=sys.stderr,
             )
             bad = 1
+
+        # Deputy E-20260813T215058Z L2: non-compile exits must be measurable (cmd)
+        # or removed — prose-only asserts are vacuous-pass class.
+        for x in exits:
+            if not isinstance(x, dict):
+                continue
+            check = str(x.get("check") or "").strip()
+            if not check or check in COMPILE_ONLY:
+                continue
+            # F5: oracle_unavailable needs reason, not cmd (Lead triage)
+            if check == "oracle_unavailable":
+                oclass = normalize_operand_class(body)
+                if not oracle_unavailable_allowed_for_class(oclass):
+                    print(
+                        f"FAIL: AR-2.3–2.7 {label}: oracle_unavailable forbidden for "
+                        f"operand_class={oclass!r} (F5a E-20260813T221456Z)",
+                        file=sys.stderr,
+                    )
+                    bad = 1
+                elif not is_oracle_unavailable(x):
+                    print(
+                        f"FAIL: AR-2.3–2.7 {label}: oracle_unavailable lacks reason "
+                        f"(E-20260813T220250Z F5)",
+                        file=sys.stderr,
+                    )
+                    bad = 1
+                continue
+            cmd = x.get("cmd")
+            if not (isinstance(cmd, str) and cmd.strip()):
+                print(
+                    f"FAIL: AR-2.3–2.7 {label}: exit {check!r} has no cmd "
+                    f"(unmeasurable; add cmd, use oracle_unavailable+reason, or drop — "
+                    f"E-20260813T215058Z L2 / E-20260813T220250Z F5)",
+                    file=sys.stderr,
+                )
+                bad = 1
 
     if checked == 0:
         print("OK: AR-2.3–2.7 idle (no REST/persistence M3 bodies)")

@@ -20,38 +20,24 @@ EXIT_CODES = """Exit codes:
   0  pass — every M3 body has a surgical, non-overlapping destination write set
      with at least one endpoint/semantic exit, or idle (no M3 bodies)
   1  BLOCK — unreadable body passed explicitly, empty destination write set,
-     unsequenced overlapping write, missing endpoint/semantic exit_criteria, or
+     missing endpoint/semantic exit_criteria (by operand_class), or
      compile-shaped-only exit_criteria (AR-4.4)
   2  usage / harness defect (bad or unknown argument)
 """
 
-COMPILE_ONLY = frozenset(
-    {
-        "compile",
-        "mvn_compile",
-        "residue",
-        "spring_residue",
-        "skills",
-        "claim_accuracy",
-        "scope",
-    }
-)
-ENDPOINTISH = frozenset(
-    {
-        "endpoint_contract",
-        "route_contract",
-        "http_status",
-        "http_semantics",
-        "route_auth",
-        "create_fk",
-        "owner_pet_visit_create",
-        "hql_entity_path",
-        "delete_cascade_it",
-        "exception_mapping",
-        "tx_rmw",
-        "concurrency",
-        "security_authz",
-    }
+# F4: single shared definition (specimen_agnostic). F1: vocab by operand_class.
+# F5: oracle_unavailable escape. Cross-story overlap owned by partition-coverage.
+from specimen_agnostic import (  # noqa: E402
+    COMPILE_ONLY,
+    ENDPOINTISH,
+    ORACLE_UNAVAILABLE_MINT_CAP,
+    collect_oracle_unavailable,
+    is_oracle_unavailable,
+    normalize_operand_class,
+    oracle_unavailable_allowed_for_class,
+    oracle_unavailable_routes_to_lead,
+    required_semantic_exits_for,
+    write_oracle_unavailable_receipt,
 )
 
 
@@ -168,47 +154,97 @@ def main() -> int:
         return 0
 
     bad = 0
-    ownership: dict[str, str] = {}
+    # F4: cross-story write overlap is owned solely by check-partition-coverage.py
+    # (honours sequence_after + pom exemption). This gate owns body-local facts.
     for label, body in bodies:
         writes = dest_write_set(body)
         if not writes:
             print(f"FAIL: AR-4.4 {label}: empty destination write set", file=sys.stderr)
             bad = 1
             continue
-        seq = body.get("sequence_after") or (body.get("identity") or {}).get("sequence_after")
-        sequenced = isinstance(seq, list) and bool(seq)
-        for w in writes:
-            norm = w.lstrip("./")
-            prev = ownership.get(norm)
-            if prev and prev != label and not sequenced:
-                print(
-                    f"FAIL: AR-4.4 overlapping write {norm} owned by {prev} and {label} "
-                    f"(set sequence_after or split ownership)",
-                    file=sys.stderr,
-                )
-                bad = 1
-            else:
-                ownership[norm] = label
 
         exits = body.get("exit_criteria") or body.get("done_when") or []
+        if not isinstance(exits, list):
+            exits = []
         checks = {
             str(x.get("check") or "")
             for x in exits
             if isinstance(x, dict)
         }
-        if not (checks & ENDPOINTISH):
+        # F5a/F5b: oracle_unavailable only for non-rest/api/src_code + reason; routes
+        oclass = normalize_operand_class(body)
+        required = required_semantic_exits_for(body)
+        escape_items = [
+            x for x in exits if isinstance(x, dict) and is_oracle_unavailable(x)
+        ]
+        has_oracle_escape = bool(escape_items)
+        if has_oracle_escape:
+            if not oracle_unavailable_allowed_for_class(oclass):
+                print(
+                    f"FAIL: AR-4.4 {label}: oracle_unavailable forbidden for "
+                    f"operand_class={oclass!r} (F5a E-20260813T221456Z — rest/api/"
+                    f"src_code always have an oracle)",
+                    file=sys.stderr,
+                )
+                bad = 1
+                has_oracle_escape = False  # do not treat as satisfying semantic exit
+            elif not all(
+                oracle_unavailable_routes_to_lead(x, operand_class=oclass)
+                for x in escape_items
+            ):
+                print(
+                    f"FAIL: AR-4.4 {label}: oracle_unavailable lacks reason "
+                    f"(F5b routes_to_lead)",
+                    file=sys.stderr,
+                )
+                bad = 1
+                has_oracle_escape = False
+        if has_oracle_escape:
+            # class-legal escape satisfies semantic-exit requirement for this body
+            pass
+        elif not (checks & required):
+            esc_hint = (
+                "oracle_unavailable+reason"
+                if oracle_unavailable_allowed_for_class(oclass)
+                else "a measurable semantic exit (oracle_unavailable forbidden for this class)"
+            )
             print(
-                f"FAIL: AR-4.4 {label}: no endpoint/semantic exit_criteria "
-                f"(compile-only insufficient; need one of {sorted(ENDPOINTISH)[:6]}…)",
+                f"FAIL: AR-4.4 {label}: no semantic exit for operand_class={oclass!r} "
+                f"(need one of {sorted(required)[:8]}; or {esc_hint} — "
+                f"E-20260813T220250Z F1/F5 / E-20260813T221456Z F5a)",
                 file=sys.stderr,
             )
             bad = 1
-        if checks and checks <= COMPILE_ONLY:
+        elif not (checks & ENDPOINTISH):
+            print(
+                f"FAIL: AR-4.4 {label}: exit check not in shared SEMANTIC_EXIT_VOCAB "
+                f"(got {sorted(checks - COMPILE_ONLY)})",
+                file=sys.stderr,
+            )
+            bad = 1
+        if checks and checks <= COMPILE_ONLY and not has_oracle_escape:
             print(
                 f"FAIL: AR-4.4 {label}: exit_criteria are compile-shaped only {sorted(checks)}",
                 file=sys.stderr,
             )
             bad = 1
+
+
+    # F5b — mint-wide debt list + fail-closed above cap (Deputy E-221456Z)
+    entries = collect_oracle_unavailable(bodies)
+    receipt = write_oracle_unavailable_receipt(root, entries)
+    if len(entries) > ORACLE_UNAVAILABLE_MINT_CAP:
+        print(
+            f"FAIL: AR-4.4 oracle_unavailable count {len(entries)} > cap "
+            f"{ORACLE_UNAVAILABLE_MINT_CAP} (F5b); see {receipt}",
+            file=sys.stderr,
+        )
+        bad = 1
+    elif entries:
+        print(
+            f"OK: F5b oracle_unavailable debt {len(entries)}/{ORACLE_UNAVAILABLE_MINT_CAP} "
+            f"→ {receipt}"
+        )
 
     if bad:
         print("AR-4.4 surgical scopes FAILED", file=sys.stderr)

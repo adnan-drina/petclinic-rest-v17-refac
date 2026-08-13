@@ -1,0 +1,14 @@
+kind: migration-ack-request
+ack_type: brief-identity
+status: unsigned
+schema: rhoai3.ack-request/v1
+story_id: S-005
+task_id: t_2ed42240
+created_at: 2026-08-13T22:23:46Z
+artifact_refs:
+  - story_id: S-005
+  - path: evidence/bodies/m3-s-005.json
+    sha256: a6b3cb4fe8143e9a3508ae9abdefd16cdadc557a5f990c0cabf10fe89877a0aa
+  - path: evidence/briefs/partition.json
+    sha256: fef88fd83d6d2607f67a62428f8c0ddcf992c59c7dd749c2470429756b703019
+notes: "Lead D1 E-20260813T222125Z regenerate after L6 remint-in-place; Architect E-155332Z Class A atomic digests; Operator signs brief-identity (no hand-copied digests)"
