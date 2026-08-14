@@ -1,0 +1,23 @@
+kind: migration-ack
+ack_type: brief-identity
+status: acknowledged
+schema: rhoai3.ack/v1
+story_id: S-006
+task_id: t_e69c3b4f
+acknowledged_by: Operator
+acknowledged_at: 2026-08-13T22:45:38Z
+authorization: standing-delegation
+delegated_to: Deputy
+delegation_ref: E-20260813T224306Z
+artifact_digests:
+  evidence/bodies/m3-s-006.json: efdaae1102e06d62c7557574d0033022666d5436be0ea0f6ac32b56703536c21
+  evidence/briefs/partition.json: fef88fd83d6d2607f67a62428f8c0ddcf992c59c7dd749c2470429756b703019
+artifact_refs:
+  - path: evidence/bodies/m3-s-006.json
+    sha256: efdaae1102e06d62c7557574d0033022666d5436be0ea0f6ac32b56703536c21
+  - path: evidence/briefs/partition.json
+    sha256: fef88fd83d6d2607f67a62428f8c0ddcf992c59c7dd749c2470429756b703019
+notes: "v17 M3 brief-identity ack under the Operator's standing delegation of E-20260813T224306Z.
+  Deputy verified 13/13 ack-requests digest-fresh and F5a/F5b/F8a/D1/D4 by execution
+  before the grant. The Operator authorized the phase advance; the Operator did not
+  review each digest individually — recorded so the audit trail is not overstated."

@@ -1,0 +1,77 @@
+{
+  "task_id": "t_abaca2a9",
+  "role": "implementing",
+  "phase": "M3",
+  "identity": {
+    "story_id": "S-009",
+    "transform_class": "HARVEST",
+    "g2_applicability": "required",
+    "operand_count": 5,
+    "sizing_basis": "operand_count",
+    "operand_class": "src_code"
+  },
+  "refs": [
+    {
+      "key": "brief_identity_ack",
+      "path": "evidence/acks/brief-identity-S-009.ack.yaml",
+      "sha256": "4b970ce19244fb15a71d25c6a7a7dcc2763281947313df893164229561b67b59"
+    },
+    {
+      "key": "legacy_locus",
+      "path": "/projects/.derived/legacy-at-3/src/main/java/org/springframework/samples/petclinic/rest/ExceptionControllerAdvice.java",
+      "sha256": "7a29847aa09d6b1dbb7634ce180fdd0ddf30c07faa2fd937635545aa749f6d9d"
+    },
+    {
+      "key": "destination_inventory",
+      "path": "evidence/receipts/destination-inventory/S-009.json",
+      "sha256": "13e89de0ae797a2ccde26088274e8b427d2b88792ee9e77a8a5f03090f97897f"
+    }
+  ],
+  "files_in_scope": [
+    "src/main/java/org/springframework/samples/petclinic/mapper/",
+    "src/main/java/org/springframework/samples/petclinic/rest/ExceptionControllerAdvice.java",
+    "src/main/java/org/springframework/samples/petclinic/rest/BindingErrorsResponse.java",
+    "src/main/java/org/springframework/samples/petclinic/util/EntityUtils.java",
+    "src/main/java/org/springframework/samples/petclinic/util/CallMonitoringAspect.java",
+    "src/main/java/org/springframework/samples/petclinic/rest/package-info.java",
+    "/projects/modernized/src/main/java/com/demo/rest/ExceptionControllerAdvice.java",
+    "/projects/modernized/src/main/java/com/demo/rest/BindingErrorsResponse.java",
+    "/projects/modernized/src/main/java/com/demo/util/EntityUtils.java",
+    "/projects/modernized/src/main/java/com/demo/util/CallMonitoringAspect.java",
+    "/projects/modernized/src/main/java/com/demo/rest/package-info.java",
+    "/projects/modernized/pom.xml",
+    "/projects/.derived/legacy-at-3/pom.xml"
+  ],
+  "files_writable": [
+    "/projects/modernized/src/main/java/com/demo/rest/ExceptionControllerAdvice.java",
+    "/projects/modernized/src/main/java/com/demo/rest/BindingErrorsResponse.java",
+    "/projects/modernized/src/main/java/com/demo/util/EntityUtils.java",
+    "/projects/modernized/src/main/java/com/demo/util/CallMonitoringAspect.java",
+    "/projects/modernized/src/main/java/com/demo/rest/package-info.java",
+    "/projects/modernized/pom.xml"
+  ],
+  "exit_criteria": [
+    {
+      "check": "quarkus_compile",
+      "cmd": "export JAVA_HOME=\"${JAVA_HOME_21}\" && export PATH=\"${JAVA_HOME}/bin:${PATH}\" && mvn -q clean compile",
+      "expect": "rc=0"
+    },
+    {
+      "check": "exception_mapping",
+      "assert": "Exception handling returns proper HTTP status codes",
+      "cmd": "grep -R -l -E \"ExceptionMapper|ResponseStatusException|@ServerExceptionMapper\" src/main/java 2>/dev/null | head -1 | grep -q .",
+      "expect": "rc=0"
+    }
+  ],
+  "rules": [],
+  "layer": "service",
+  "dependencies": [],
+  "constraints": [
+    "FORBIDDEN API: do not use @IfBuildProfile (any profile). Required path: %profile config / build-time alternatives per skill_view references/di-config.md (Pre-v12 R5 / Architect E-20260811T102405Z). Silent adoption after quoting this forbid = execute-as-defined FAIL/abort.",
+    "REQUIRED PATH (profile locality): use %mysql / %postgresql (or matching) Quarkus profile config in application-*.properties \u2014 never @IfBuildProfile / @Profile on beans for this story's writable set (Operator E-20260811T200426Z).",
+    "WRITE-SET (AR-4.4): write only files_writable / destination write-set. Readable deps and OOS paths are not write authority. Silent OOS writes = FAIL/abort.",
+    "COVERAGE-GAP: orphan model/interface / missing dependency owner \u21d2 typed needs_input BLOCK (escalate Lead) \u2014 NEVER OOS-invent types or owners.",
+    "RESIDUE: do not leave Spring/javax migration residue in files_writable that the story claims to migrate; unfinished in-scope residue \u21d2 typed needs_input, not kanban_complete.",
+    "CORS_OUT_OF_SCOPE (HARD / tip-bank B2): do NOT implement @CrossOrigin, CORS filters, or CORS essays. CORS is platform/infra \u2014 write REST resources first; typed needs_input if blocked, never thrash on CORS."
+  ]
+}

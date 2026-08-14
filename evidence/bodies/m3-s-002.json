@@ -1,0 +1,77 @@
+{
+  "task_id": "t_b9ec757b",
+  "role": "implementing",
+  "phase": "M3",
+  "identity": {
+    "story_id": "S-002",
+    "transform_class": "CONFIG",
+    "g2_applicability": "not_applicable",
+    "operand_count": 5,
+    "sizing_basis": "operand_count",
+    "operand_class": "build_config"
+  },
+  "refs": [
+    {
+      "key": "brief_identity_ack",
+      "path": "evidence/acks/brief-identity-S-002.ack.yaml",
+      "sha256": "6a360f1fa1619cba9aa4bd00bce706c0c7b1efde49a4f002eb362882bd52d9e0"
+    },
+    {
+      "key": "legacy_locus",
+      "path": "/projects/.derived/legacy-at-3/src/main/resources/application.properties",
+      "sha256": "6a95347f9c0943b9c64bf150e71c6a08250c170b25d827b0c36c2b7c3edcd36b"
+    },
+    {
+      "key": "destination_inventory",
+      "path": "evidence/receipts/destination-inventory/S-002.json",
+      "sha256": "79c29f12ffeb8689bbb3f4a69ca0edf2da0516bb3843f7c8bb428b01312155c8"
+    }
+  ],
+  "files_in_scope": [
+    "src/main/resources/application.properties",
+    "src/main/resources/application-hsqldb.properties",
+    "src/main/resources/application-mysql.properties",
+    "src/main/resources/application-postgresql.properties",
+    "src/main/resources/db/",
+    "/projects/modernized/src/main/resources/application.properties",
+    "/projects/modernized/src/main/resources/application-hsqldb.properties",
+    "/projects/modernized/src/main/resources/application-mysql.properties",
+    "/projects/modernized/src/main/resources/application-postgresql.properties",
+    "/projects/modernized/pom.xml",
+    "/projects/.derived/legacy-at-3/pom.xml"
+  ],
+  "files_writable": [
+    "/projects/modernized/src/main/resources/application.properties",
+    "/projects/modernized/src/main/resources/application-hsqldb.properties",
+    "/projects/modernized/src/main/resources/application-mysql.properties",
+    "/projects/modernized/src/main/resources/application-postgresql.properties",
+    "/projects/modernized/pom.xml"
+  ],
+  "exit_criteria": [
+    {
+      "check": "quarkus_compile",
+      "cmd": "export JAVA_HOME=\"${JAVA_HOME_21}\" && export PATH=\"${JAVA_HOME}/bin:${PATH}\" && mvn -q clean compile",
+      "expect": "rc=0"
+    },
+    {
+      "check": "http_semantics",
+      "assert": "Application profiles (hsqldb, mysql, postgresql) load correctly with Quarkus smallrye-config",
+      "cmd": "test -d src/main/java && grep -R -l -E \"@Path|ExceptionMapper|ResponseStatus|@ApplicationPath|/q/health\" src/main/java pom.xml src/main/resources 2>/dev/null | head -1 | grep -q .",
+      "expect": "rc=0"
+    }
+  ],
+  "rules": [
+    "springboot-properties-to-quarkus-00000",
+    "springboot-properties-to-quarkus-00001",
+    "springboot-properties-to-quarkus-00002",
+    "springboot-properties-to-quarkus-00003"
+  ],
+  "layer": "foundation",
+  "dependencies": [],
+  "constraints": [
+    "FORBIDDEN API: do not use @IfBuildProfile (any profile). Required path: %profile config / build-time alternatives per skill_view references/di-config.md (Pre-v12 R5 / Architect E-20260811T102405Z). Silent adoption after quoting this forbid = execute-as-defined FAIL/abort.",
+    "WRITE-SET (AR-4.4): write only files_writable / destination write-set. Readable deps and OOS paths are not write authority. Silent OOS writes = FAIL/abort.",
+    "COVERAGE-GAP: orphan model/interface / missing dependency owner \u21d2 typed needs_input BLOCK (escalate Lead) \u2014 NEVER OOS-invent types or owners.",
+    "BUILD_CONFIG: edit only declared properties/config operands; do not expand into src_code without typed needs_input / Lead rescope."
+  ]
+}

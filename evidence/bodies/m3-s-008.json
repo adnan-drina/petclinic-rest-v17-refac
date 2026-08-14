@@ -1,0 +1,102 @@
+{
+  "task_id": "t_130750cc",
+  "role": "implementing",
+  "phase": "M3",
+  "identity": {
+    "story_id": "S-008",
+    "transform_class": "HARVEST",
+    "g2_applicability": "required",
+    "operand_count": 5,
+    "sizing_basis": "operand_count",
+    "operand_class": "src_code"
+  },
+  "refs": [
+    {
+      "key": "brief_identity_ack",
+      "path": "evidence/acks/brief-identity-S-008.ack.yaml",
+      "sha256": "74040e86f3d4cfb4f8ebab7e705a138f0bd87685a3884ef69f8c1b3bc71816f0"
+    },
+    {
+      "key": "legacy_locus",
+      "path": "/projects/.derived/legacy-at-3/src/main/java/org/springframework/samples/petclinic/rest/VetRestController.java",
+      "sha256": "33935173fe285894aed89c036746d74ea5c651e9023804d3f9f8c18b3e33bf48"
+    },
+    {
+      "key": "destination_inventory",
+      "path": "evidence/receipts/destination-inventory/S-008.json",
+      "sha256": "a55ded72df0829ae16b5df4bf391f7ba64891fa4f67c4a6a5d44bbbd95edc4cc"
+    }
+  ],
+  "files_in_scope": [
+    "src/main/java/org/springframework/samples/petclinic/rest/VetRestController.java",
+    "src/main/java/org/springframework/samples/petclinic/rest/SpecialtyRestController.java",
+    "src/main/java/org/springframework/samples/petclinic/rest/VisitRestController.java",
+    "src/main/java/org/springframework/samples/petclinic/rest/UserRestController.java",
+    "src/main/java/org/springframework/samples/petclinic/rest/RootRestController.java",
+    "/projects/modernized/src/main/java/com/demo/rest/VetRestController.java",
+    "/projects/modernized/src/main/java/com/demo/rest/SpecialtyRestController.java",
+    "/projects/modernized/src/main/java/com/demo/rest/VisitRestController.java",
+    "/projects/modernized/src/main/java/com/demo/rest/UserRestController.java",
+    "/projects/modernized/src/main/java/com/demo/rest/RootRestController.java",
+    "/projects/modernized/pom.xml",
+    "/projects/.derived/legacy-at-3/pom.xml"
+  ],
+  "files_writable": [
+    "/projects/modernized/src/main/java/com/demo/rest/VetRestController.java",
+    "/projects/modernized/src/main/java/com/demo/rest/SpecialtyRestController.java",
+    "/projects/modernized/src/main/java/com/demo/rest/VisitRestController.java",
+    "/projects/modernized/src/main/java/com/demo/rest/UserRestController.java",
+    "/projects/modernized/src/main/java/com/demo/rest/RootRestController.java",
+    "/projects/modernized/pom.xml"
+  ],
+  "exit_criteria": [
+    {
+      "check": "quarkus_compile",
+      "cmd": "export JAVA_HOME=\"${JAVA_HOME_21}\" && export PATH=\"${JAVA_HOME}/bin:${PATH}\" && mvn -q clean compile",
+      "expect": "rc=0"
+    },
+    {
+      "check": "endpoint_contract",
+      "assert": "REST endpoints return correct JSON responses matching legacy behavior",
+      "cmd": "grep -R -l -E \"@Path|@GET|@POST|@PUT|@DELETE\" src/main/java 2>/dev/null | head -1 | grep -q .",
+      "expect": "rc=0"
+    },
+    {
+      "check": "create_fk",
+      "assert": "Vet/Specialty create operations work with proper FK relationships",
+      "cmd": "grep -R -l -E \"ManyToOne|OneToMany|JoinColumn|CascadeType\" src/main/java 2>/dev/null | head -1 | grep -q .",
+      "expect": "rc=0"
+    },
+    {
+      "check": "owner_pet_visit_create",
+      "assert": "Vet and Specialty creation endpoints return correct responses",
+      "cmd": "grep -R -l -E \"Owner|Pet|Visit\" src/main/java 2>/dev/null | head -1 | grep -q .",
+      "expect": "rc=0"
+    },
+    {
+      "check": "exception_mapping",
+      "assert": "REST exceptions map to proper HTTP status codes",
+      "cmd": "grep -R -l -E \"ExceptionMapper|ResponseStatusException|@ServerExceptionMapper\" src/main/java 2>/dev/null | head -1 | grep -q .",
+      "expect": "rc=0"
+    },
+    {
+      "check": "http_semantics",
+      "assert": "REST endpoints return correct HTTP semantics",
+      "cmd": "test -d src/main/java && grep -R -l -E \"@Path|ExceptionMapper|ResponseStatus|@ApplicationPath|/q/health\" src/main/java pom.xml src/main/resources 2>/dev/null | head -1 | grep -q .",
+      "expect": "rc=0"
+    }
+  ],
+  "rules": [
+    "springboot-web-to-quarkus-00000",
+    "springboot-annotations-to-quarkus-00000"
+  ],
+  "layer": "rest",
+  "dependencies": [],
+  "constraints": [
+    "FORBIDDEN API: do not use @IfBuildProfile (any profile). Required path: %profile config / build-time alternatives per skill_view references/di-config.md (Pre-v12 R5 / Architect E-20260811T102405Z). Silent adoption after quoting this forbid = execute-as-defined FAIL/abort.",
+    "WRITE-SET (AR-4.4): write only files_writable / destination write-set. Readable deps and OOS paths are not write authority. Silent OOS writes = FAIL/abort.",
+    "COVERAGE-GAP: orphan model/interface / missing dependency owner \u21d2 typed needs_input BLOCK (escalate Lead) \u2014 NEVER OOS-invent types or owners.",
+    "RESIDUE: do not leave Spring/javax migration residue in files_writable that the story claims to migrate; unfinished in-scope residue \u21d2 typed needs_input, not kanban_complete.",
+    "CORS_OUT_OF_SCOPE (HARD / tip-bank B2): do NOT implement @CrossOrigin, CORS filters, or CORS essays. CORS is platform/infra \u2014 write REST resources first; typed needs_input if blocked, never thrash on CORS."
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "task_id": "t_2ed42240",
+  "role": "implementing",
+  "phase": "M3",
+  "identity": {
+    "story_id": "S-005",
+    "transform_class": "HARVEST",
+    "g2_applicability": "required",
+    "operand_count": 4,
+    "sizing_basis": "operand_count",
+    "operand_class": "src_code"
+  },
+  "refs": [
+    {
+      "key": "brief_identity_ack",
+      "path": "evidence/acks/brief-identity-S-005.ack.yaml",
+      "sha256": "18a857fa69ddbde4fb378f921098e1ebb908a31955a948d7e518fc46714f01e0"
+    },
+    {
+      "key": "legacy_locus",
+      "path": "/projects/.derived/legacy-at-3/src/main/java/org/springframework/samples/petclinic/service/ClinicService.java",
+      "sha256": "f6168050cf22438f24dab249fef18655d70a186ac0bf5498104a916377445d04"
+    },
+    {
+      "key": "destination_inventory",
+      "path": "evidence/receipts/destination-inventory/S-005.json",
+      "sha256": "3eded23ef5910d21f51865e8c153c0b9407689263637743ae95b00c9fbfbea33"
+    }
+  ],
+  "files_in_scope": [
+    "src/main/java/org/springframework/samples/petclinic/service/ClinicService.java",
+    "src/main/java/org/springframework/samples/petclinic/service/ClinicServiceImpl.java",
+    "src/main/java/org/springframework/samples/petclinic/service/UserService.java",
+    "src/main/java/org/springframework/samples/petclinic/service/UserServiceImpl.java",
+    "/projects/modernized/src/main/java/com/demo/service/ClinicService.java",
+    "/projects/modernized/src/main/java/com/demo/service/ClinicServiceImpl.java",
+    "/projects/modernized/src/main/java/com/demo/service/UserService.java",
+    "/projects/modernized/src/main/java/com/demo/service/UserServiceImpl.java",
+    "/projects/modernized/pom.xml",
+    "/projects/.derived/legacy-at-3/pom.xml"
+  ],
+  "files_writable": [
+    "/projects/modernized/src/main/java/com/demo/service/ClinicService.java",
+    "/projects/modernized/src/main/java/com/demo/service/ClinicServiceImpl.java",
+    "/projects/modernized/src/main/java/com/demo/service/UserService.java",
+    "/projects/modernized/src/main/java/com/demo/service/UserServiceImpl.java",
+    "/projects/modernized/pom.xml"
+  ],
+  "exit_criteria": [
+    {
+      "check": "quarkus_compile",
+      "cmd": "export JAVA_HOME=\"${JAVA_HOME_21}\" && export PATH=\"${JAVA_HOME}/bin:${PATH}\" && mvn -q clean compile",
+      "expect": "rc=0"
+    },
+    {
+      "check": "tx_rmw",
+      "assert": "CDI service beans handle transactions correctly",
+      "cmd": "grep -R -l -E \"@Transactional|UserTransaction|TransactionManager\" src/main/java 2>/dev/null | head -1 | grep -q .",
+      "expect": "rc=0"
+    }
+  ],
+  "rules": [
+    "springboot-di-to-quarkus-00000",
+    "springboot-di-to-quarkus-00003",
+    "spring-components-00002"
+  ],
+  "layer": "service",
+  "dependencies": [],
+  "constraints": [
+    "FORBIDDEN API: do not use @IfBuildProfile (any profile). Required path: %profile config / build-time alternatives per skill_view references/di-config.md (Pre-v12 R5 / Architect E-20260811T102405Z). Silent adoption after quoting this forbid = execute-as-defined FAIL/abort.",
+    "WRITE-SET (AR-4.4): write only files_writable / destination write-set. Readable deps and OOS paths are not write authority. Silent OOS writes = FAIL/abort.",
+    "COVERAGE-GAP: orphan model/interface / missing dependency owner \u21d2 typed needs_input BLOCK (escalate Lead) \u2014 NEVER OOS-invent types or owners.",
+    "RESIDUE: do not leave Spring/javax migration residue in files_writable that the story claims to migrate; unfinished in-scope residue \u21d2 typed needs_input, not kanban_complete.",
+    "CORS_OUT_OF_SCOPE (HARD / tip-bank B2): do NOT implement @CrossOrigin, CORS filters, or CORS essays. CORS is platform/infra \u2014 write REST resources first; typed needs_input if blocked, never thrash on CORS."
+  ]
+}

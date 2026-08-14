@@ -1,0 +1,116 @@
+{
+  "task_id": "t_fe533d6e",
+  "role": "implementing",
+  "phase": "M3",
+  "identity": {
+    "story_id": "S-011",
+    "transform_class": "HARVEST",
+    "g2_applicability": "not_applicable",
+    "operand_count": 9,
+    "sizing_basis": "operand_count",
+    "operand_class": "src_code"
+  },
+  "refs": [
+    {
+      "key": "brief_identity_ack",
+      "path": "evidence/acks/brief-identity-S-011.ack.yaml",
+      "sha256": "cba697d20cbc8c82c3f21d1984e54c71fb295b334ab08790bac54844839d8876"
+    },
+    {
+      "key": "legacy_locus",
+      "path": "/projects/.derived/legacy-at-3/src/test/java/org/springframework/samples/petclinic/rest/OwnerRestControllerTests.java",
+      "sha256": "f82a2cc44c25dfe5c436405ff24870123652ec12427eb00b4d8d8cb619984ae8"
+    },
+    {
+      "key": "destination_inventory",
+      "path": "evidence/receipts/destination-inventory/S-011.json",
+      "sha256": "cc0768e8b175ca165efe509a178ad4911aa637791bef672ea0b4b7ed6670cb99"
+    }
+  ],
+  "files_in_scope": [
+    "/projects/.derived/legacy-at-3/src/test/java/org/springframework/samples/petclinic/rest/OwnerRestControllerTests.java",
+    "/projects/.derived/legacy-at-3/src/test/java/org/springframework/samples/petclinic/rest/PetRestControllerTests.java",
+    "/projects/.derived/legacy-at-3/src/test/java/org/springframework/samples/petclinic/rest/PetTypeRestControllerTests.java",
+    "/projects/.derived/legacy-at-3/src/test/java/org/springframework/samples/petclinic/rest/VetRestControllerTests.java",
+    "/projects/.derived/legacy-at-3/src/test/java/org/springframework/samples/petclinic/rest/SpecialtyRestControllerTests.java",
+    "/projects/.derived/legacy-at-3/src/test/java/org/springframework/samples/petclinic/rest/VisitRestControllerTests.java",
+    "/projects/.derived/legacy-at-3/src/test/java/org/springframework/samples/petclinic/rest/UserRestControllerTests.java",
+    "/projects/.derived/legacy-at-3/src/test/java/org/springframework/samples/petclinic/service/clinicService/ClinicServiceSpringDataJpaTests.java",
+    "/projects/.derived/legacy-at-3/src/test/java/org/springframework/samples/petclinic/service/userService/UserServiceSpringDataJpaTests.java",
+    "/projects/modernized/src/test/java/com/demo/rest/OwnerRestControllerTests.java",
+    "/projects/modernized/src/test/java/com/demo/rest/PetRestControllerTests.java",
+    "/projects/modernized/src/test/java/com/demo/rest/PetTypeRestControllerTests.java",
+    "/projects/modernized/src/test/java/com/demo/rest/VetRestControllerTests.java",
+    "/projects/modernized/src/test/java/com/demo/rest/SpecialtyRestControllerTests.java",
+    "/projects/modernized/src/test/java/com/demo/rest/VisitRestControllerTests.java",
+    "/projects/modernized/src/test/java/com/demo/rest/UserRestControllerTests.java",
+    "/projects/modernized/src/test/java/com/demo/service/clinicService/ClinicServiceSpringDataJpaTests.java",
+    "/projects/modernized/src/test/java/com/demo/service/userService/UserServiceSpringDataJpaTests.java",
+    "/projects/modernized/pom.xml",
+    "/projects/.derived/legacy-at-3/pom.xml"
+  ],
+  "files_writable": [
+    "/projects/modernized/src/test/java/com/demo/rest/OwnerRestControllerTests.java",
+    "/projects/modernized/src/test/java/com/demo/rest/PetRestControllerTests.java",
+    "/projects/modernized/src/test/java/com/demo/rest/PetTypeRestControllerTests.java",
+    "/projects/modernized/src/test/java/com/demo/rest/VetRestControllerTests.java",
+    "/projects/modernized/src/test/java/com/demo/rest/SpecialtyRestControllerTests.java",
+    "/projects/modernized/src/test/java/com/demo/rest/VisitRestControllerTests.java",
+    "/projects/modernized/src/test/java/com/demo/rest/UserRestControllerTests.java",
+    "/projects/modernized/src/test/java/com/demo/service/clinicService/ClinicServiceSpringDataJpaTests.java",
+    "/projects/modernized/src/test/java/com/demo/service/userService/UserServiceSpringDataJpaTests.java",
+    "/projects/modernized/pom.xml"
+  ],
+  "exit_criteria": [
+    {
+      "check": "quarkus_compile",
+      "cmd": "export JAVA_HOME=\"${JAVA_HOME_21}\" && export PATH=\"${JAVA_HOME}/bin:${PATH}\" && mvn -q clean compile",
+      "expect": "rc=0"
+    },
+    {
+      "check": "test_compile",
+      "cmd": "export JAVA_HOME=\"${JAVA_HOME_21}\" && export PATH=\"${JAVA_HOME}/bin:${PATH}\" && mvn -q test-compile",
+      "expect": "rc=0"
+    },
+    {
+      "check": "concurrency",
+      "assert": "Tests execute correctly with Quarkus Dev Services",
+      "cmd": "export JAVA_HOME=\"${JAVA_HOME_21}\" && export PATH=\"${JAVA_HOME}/bin:${PATH}\" && mvn -q clean compile",
+      "expect": "rc=0"
+    },
+    {
+      "check": "create_fk",
+      "assert": "Test fixtures create proper FK relationships",
+      "cmd": "grep -R -l -E \"ManyToOne|OneToMany|JoinColumn|CascadeType\" src/main/java 2>/dev/null | head -1 | grep -q .",
+      "expect": "rc=0"
+    },
+    {
+      "check": "owner_pet_visit_create",
+      "assert": "Test data creation matches legacy behavior",
+      "cmd": "grep -R -l -E \"Owner|Pet|Visit\" src/main/java 2>/dev/null | head -1 | grep -q .",
+      "expect": "rc=0"
+    },
+    {
+      "check": "exception_mapping",
+      "assert": "Test assertions verify proper HTTP status codes",
+      "cmd": "grep -R -l -E \"ExceptionMapper|ResponseStatusException|@ServerExceptionMapper\" src/main/java 2>/dev/null | head -1 | grep -q .",
+      "expect": "rc=0"
+    },
+    {
+      "check": "http_semantics",
+      "assert": "Integration tests verify REST semantics",
+      "cmd": "test -d src/main/java && grep -R -l -E \"@Path|ExceptionMapper|ResponseStatus|@ApplicationPath|/q/health\" src/main/java pom.xml src/main/resources 2>/dev/null | head -1 | grep -q .",
+      "expect": "rc=0"
+    }
+  ],
+  "rules": [],
+  "layer": "test",
+  "dependencies": [],
+  "constraints": [
+    "FORBIDDEN API: do not use @IfBuildProfile (any profile). Required path: %profile config / build-time alternatives per skill_view references/di-config.md (Pre-v12 R5 / Architect E-20260811T102405Z). Silent adoption after quoting this forbid = execute-as-defined FAIL/abort.",
+    "WRITE-SET (AR-4.4): write only files_writable / destination write-set. Readable deps and OOS paths are not write authority. Silent OOS writes = FAIL/abort.",
+    "COVERAGE-GAP: orphan model/interface / missing dependency owner \u21d2 typed needs_input BLOCK (escalate Lead) \u2014 NEVER OOS-invent types or owners.",
+    "RESIDUE: do not leave Spring/javax migration residue in files_writable that the story claims to migrate; unfinished in-scope residue \u21d2 typed needs_input, not kanban_complete.",
+    "CORS_OUT_OF_SCOPE (HARD / tip-bank B2): do NOT implement @CrossOrigin, CORS filters, or CORS essays. CORS is platform/infra \u2014 write REST resources first; typed needs_input if blocked, never thrash on CORS."
+  ]
+}

@@ -1,8 +1,6 @@
 {
   "schema": "rhoai3.body-digest/v1",
-  "task_id": "pending",
-  "body_path": "/projects/modernized/evidence/bodies/m3-s-001.json",
-  "body_sha256": "1f3f2e48bb57b8970621718ff111898163d380514c1e28990cdefccb5db42047",
-  "stamped_at": "2026-08-13T22:25:02Z",
-  "restamp_reason": "Lead E-20260813T214048Z/E-215058Z L1/L2 remint-in-place"
+  "task_id": "t_b46de460",
+  "body_path": "evidence/bodies/m3-s-001.json",
+  "body_sha256": "bb8fe754e6226dd62ca4617f256cd4b89642c7ebf091c14b85f0cdbb4e62183d"
 }

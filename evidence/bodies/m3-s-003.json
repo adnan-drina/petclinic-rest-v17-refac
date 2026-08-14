@@ -1,0 +1,96 @@
+{
+  "task_id": "t_5fafcbe9",
+  "role": "implementing",
+  "phase": "M3",
+  "identity": {
+    "story_id": "S-003",
+    "transform_class": "HARVEST",
+    "g2_applicability": "not_applicable",
+    "operand_count": 12,
+    "sizing_basis": "operand_count",
+    "operand_class": "src_code"
+  },
+  "refs": [
+    {
+      "key": "brief_identity_ack",
+      "path": "evidence/acks/brief-identity-S-003.ack.yaml",
+      "sha256": "5878cdd3fdf881a670144cadc07a1b3bab23bd7f293e1b142a72a98fe6106c98"
+    },
+    {
+      "key": "legacy_locus",
+      "path": "/projects/.derived/legacy-at-3/src/main/java/org/springframework/samples/petclinic/model/BaseEntity.java",
+      "sha256": "32616672f616a0d8d762f4de2a53d21d5790476de5d20a463ea6c0e9542c1f96"
+    },
+    {
+      "key": "destination_inventory",
+      "path": "evidence/receipts/destination-inventory/S-003.json",
+      "sha256": "f82fe8d6eb248634d78341399c2d0547783b14f1dd6f332607cb2c4e698cd909"
+    }
+  ],
+  "files_in_scope": [
+    "src/main/java/org/springframework/samples/petclinic/model/BaseEntity.java",
+    "src/main/java/org/springframework/samples/petclinic/model/NamedEntity.java",
+    "src/main/java/org/springframework/samples/petclinic/model/Person.java",
+    "src/main/java/org/springframework/samples/petclinic/model/Owner.java",
+    "src/main/java/org/springframework/samples/petclinic/model/Pet.java",
+    "src/main/java/org/springframework/samples/petclinic/model/PetType.java",
+    "src/main/java/org/springframework/samples/petclinic/model/Vet.java",
+    "src/main/java/org/springframework/samples/petclinic/model/Specialty.java",
+    "src/main/java/org/springframework/samples/petclinic/model/Visit.java",
+    "src/main/java/org/springframework/samples/petclinic/model/User.java",
+    "src/main/java/org/springframework/samples/petclinic/model/Role.java",
+    "src/main/java/org/springframework/samples/petclinic/model/package-info.java",
+    "/projects/modernized/src/main/java/com/demo/model/BaseEntity.java",
+    "/projects/modernized/src/main/java/com/demo/model/NamedEntity.java",
+    "/projects/modernized/src/main/java/com/demo/model/Person.java",
+    "/projects/modernized/src/main/java/com/demo/model/Owner.java",
+    "/projects/modernized/src/main/java/com/demo/model/Pet.java",
+    "/projects/modernized/src/main/java/com/demo/model/PetType.java",
+    "/projects/modernized/src/main/java/com/demo/model/Vet.java",
+    "/projects/modernized/src/main/java/com/demo/model/Specialty.java",
+    "/projects/modernized/src/main/java/com/demo/model/Visit.java",
+    "/projects/modernized/src/main/java/com/demo/model/User.java",
+    "/projects/modernized/src/main/java/com/demo/model/Role.java",
+    "/projects/modernized/src/main/java/com/demo/model/package-info.java",
+    "/projects/modernized/pom.xml",
+    "/projects/.derived/legacy-at-3/pom.xml"
+  ],
+  "files_writable": [
+    "/projects/modernized/src/main/java/com/demo/model/BaseEntity.java",
+    "/projects/modernized/src/main/java/com/demo/model/NamedEntity.java",
+    "/projects/modernized/src/main/java/com/demo/model/Person.java",
+    "/projects/modernized/src/main/java/com/demo/model/Owner.java",
+    "/projects/modernized/src/main/java/com/demo/model/Pet.java",
+    "/projects/modernized/src/main/java/com/demo/model/PetType.java",
+    "/projects/modernized/src/main/java/com/demo/model/Vet.java",
+    "/projects/modernized/src/main/java/com/demo/model/Specialty.java",
+    "/projects/modernized/src/main/java/com/demo/model/Visit.java",
+    "/projects/modernized/src/main/java/com/demo/model/User.java",
+    "/projects/modernized/src/main/java/com/demo/model/Role.java",
+    "/projects/modernized/src/main/java/com/demo/model/package-info.java",
+    "/projects/modernized/pom.xml"
+  ],
+  "exit_criteria": [
+    {
+      "check": "quarkus_compile",
+      "cmd": "export JAVA_HOME=\"${JAVA_HOME_21}\" && export PATH=\"${JAVA_HOME}/bin:${PATH}\" && mvn -q clean compile",
+      "expect": "rc=0"
+    },
+    {
+      "check": "hql_entity_path",
+      "assert": "All JPA entities map correctly to database tables with proper relationships",
+      "cmd": "grep -R -l -E \"EntityManager|@Query|createQuery|PanacheEntity\" src/main/java 2>/dev/null | head -1 | grep -q .",
+      "expect": "rc=0"
+    }
+  ],
+  "rules": [],
+  "layer": "model",
+  "dependencies": [],
+  "constraints": [
+    "FORBIDDEN API: do not use @IfBuildProfile (any profile). Required path: %profile config / build-time alternatives per skill_view references/di-config.md (Pre-v12 R5 / Architect E-20260811T102405Z). Silent adoption after quoting this forbid = execute-as-defined FAIL/abort.",
+    "WRITE-SET (AR-4.4): write only files_writable / destination write-set. Readable deps and OOS paths are not write authority. Silent OOS writes = FAIL/abort.",
+    "COVERAGE-GAP: orphan model/interface / missing dependency owner \u21d2 typed needs_input BLOCK (escalate Lead) \u2014 NEVER OOS-invent types or owners.",
+    "RESIDUE: do not leave Spring/javax migration residue in files_writable that the story claims to migrate; unfinished in-scope residue \u21d2 typed needs_input, not kanban_complete.",
+    "CORS_OUT_OF_SCOPE (HARD / tip-bank B2): do NOT implement @CrossOrigin, CORS filters, or CORS essays. CORS is platform/infra \u2014 write REST resources first; typed needs_input if blocked, never thrash on CORS."
+  ]
+}

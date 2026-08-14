@@ -1,0 +1,80 @@
+{
+  "task_id": "t_4dfba74f",
+  "role": "implementing",
+  "phase": "M3",
+  "identity": {
+    "story_id": "S-010",
+    "transform_class": "CONFIG",
+    "g2_applicability": "not_applicable",
+    "operand_count": 3,
+    "sizing_basis": "operand_count",
+    "operand_class": "src_code"
+  },
+  "refs": [
+    {
+      "key": "brief_identity_ack",
+      "path": "evidence/acks/brief-identity-S-010.ack.yaml",
+      "sha256": "90a8582c9f1a4b66ad6769850e73f39e5c27a65a72169fd59df55d477fbda3ec"
+    },
+    {
+      "key": "legacy_locus",
+      "path": "/projects/.derived/legacy-at-3/src/main/java/org/springframework/samples/petclinic/PetClinicApplication.java",
+      "sha256": "b306fb637972ace956b84610621076b61c9b136f0bb53d0336431da9d68b6538"
+    },
+    {
+      "key": "destination_inventory",
+      "path": "evidence/receipts/destination-inventory/S-010.json",
+      "sha256": "7ed5803fef73cd04bcb7857b431e0f79eb74e45fd75387a27eaef03725c590d4"
+    }
+  ],
+  "files_in_scope": [
+    "src/main/java/org/springframework/samples/petclinic/PetClinicApplication.java",
+    "/projects/modernized/src/main/java/com/demo/PetClinicApplication.java",
+    "src/main/resources/application.properties",
+    "/projects/modernized/src/main/resources/application.properties",
+    "/projects/modernized/pom.xml",
+    "/projects/.derived/legacy-at-3/pom.xml"
+  ],
+  "files_writable": [
+    "/projects/modernized/src/main/java/com/demo/PetClinicApplication.java",
+    "/projects/modernized/src/main/resources/application.properties",
+    "/projects/modernized/pom.xml"
+  ],
+  "exit_criteria": [
+    {
+      "check": "quarkus_compile",
+      "cmd": "export JAVA_HOME=\"${JAVA_HOME_21}\" && export PATH=\"${JAVA_HOME}/bin:${PATH}\" && mvn -q clean compile",
+      "expect": "rc=0"
+    },
+    {
+      "check": "http_semantics",
+      "cmd": "grep -E 'smallrye-health|quarkus-smallrye-health|/q/health' pom.xml src/main/resources/application.properties 2>/dev/null | head -1 | grep -q .",
+      "expect": "rc=0",
+      "assert": "Health extension or /q/health config present"
+    },
+    {
+      "check": "micrometer_extension",
+      "cmd": "grep -E 'micrometer|quarkus-micrometer' pom.xml src/main/resources/application.properties 2>/dev/null | head -1 | grep -q .",
+      "expect": "rc=0",
+      "assert": "Micrometer metrics extension or config present"
+    }
+  ],
+  "rules": [
+    "springboot-actuator-to-quarkus-0100",
+    "springboot-metrics-to-quarkus-0100",
+    "springboot-metrics-to-quarkus-0200",
+    "springboot-jmx-to-quarkus-00001"
+  ],
+  "layer": "foundation",
+  "dependencies": [],
+  "constraints": [
+    "FORBIDDEN API: do not use @IfBuildProfile (any profile). Required path: %profile config / build-time alternatives per skill_view references/di-config.md (Pre-v12 R5 / Architect E-20260811T102405Z). Silent adoption after quoting this forbid = execute-as-defined FAIL/abort.",
+    "WRITE-SET (AR-4.4): write only files_writable / destination write-set. Readable deps and OOS paths are not write authority. Silent OOS writes = FAIL/abort.",
+    "COVERAGE-GAP: orphan model/interface / missing dependency owner \u21d2 typed needs_input BLOCK (escalate Lead) \u2014 NEVER OOS-invent types or owners.",
+    "RESIDUE: do not leave Spring/javax migration residue in files_writable that the story claims to migrate; unfinished in-scope residue \u21d2 typed needs_input, not kanban_complete.",
+    "CORS_OUT_OF_SCOPE (HARD / tip-bank B2): do NOT implement @CrossOrigin, CORS filters, or CORS essays. CORS is platform/infra \u2014 write REST resources first; typed needs_input if blocked, never thrash on CORS."
+  ],
+  "sequence_after": [
+    "S-002"
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "task_id": "t_9e0af809",
+  "role": "implementing",
+  "phase": "M3",
+  "identity": {
+    "story_id": "S-004",
+    "transform_class": "HARVEST",
+    "g2_applicability": "not_applicable",
+    "operand_count": 7,
+    "sizing_basis": "operand_count",
+    "operand_class": "src_code"
+  },
+  "refs": [
+    {
+      "key": "brief_identity_ack",
+      "path": "evidence/acks/brief-identity-S-004.ack.yaml",
+      "sha256": "ca8937d81d54188c429956e5818b4e5d132f7eed3624714e2087753aa2f68a5c"
+    },
+    {
+      "key": "legacy_locus",
+      "path": "/projects/.derived/legacy-at-3/src/main/java/org/springframework/samples/petclinic/repository/OwnerRepository.java",
+      "sha256": "3ba4cc44161bf9d6622597a113844892578e42c952453e71230e48ea85d7b00a"
+    },
+    {
+      "key": "destination_inventory",
+      "path": "evidence/receipts/destination-inventory/S-004.json",
+      "sha256": "3bfe9d199d7f32fc8917f766d745d8f9a416ee7f6d61b45f34610621c47a5557"
+    }
+  ],
+  "files_in_scope": [
+    "src/main/java/org/springframework/samples/petclinic/repository/OwnerRepository.java",
+    "src/main/java/org/springframework/samples/petclinic/repository/PetRepository.java",
+    "src/main/java/org/springframework/samples/petclinic/repository/PetTypeRepository.java",
+    "src/main/java/org/springframework/samples/petclinic/repository/VetRepository.java",
+    "src/main/java/org/springframework/samples/petclinic/repository/SpecialtyRepository.java",
+    "src/main/java/org/springframework/samples/petclinic/repository/VisitRepository.java",
+    "src/main/java/org/springframework/samples/petclinic/repository/UserRepository.java",
+    "src/main/java/org/springframework/samples/petclinic/repository/springdatajpa/",
+    "/projects/modernized/src/main/java/com/demo/repository/OwnerRepository.java",
+    "/projects/modernized/src/main/java/com/demo/repository/PetRepository.java",
+    "/projects/modernized/src/main/java/com/demo/repository/PetTypeRepository.java",
+    "/projects/modernized/src/main/java/com/demo/repository/VetRepository.java",
+    "/projects/modernized/src/main/java/com/demo/repository/SpecialtyRepository.java",
+    "/projects/modernized/src/main/java/com/demo/repository/VisitRepository.java",
+    "/projects/modernized/src/main/java/com/demo/repository/UserRepository.java",
+    "/projects/modernized/pom.xml",
+    "/projects/.derived/legacy-at-3/pom.xml"
+  ],
+  "files_writable": [
+    "/projects/modernized/src/main/java/com/demo/repository/OwnerRepository.java",
+    "/projects/modernized/src/main/java/com/demo/repository/PetRepository.java",
+    "/projects/modernized/src/main/java/com/demo/repository/PetTypeRepository.java",
+    "/projects/modernized/src/main/java/com/demo/repository/VetRepository.java",
+    "/projects/modernized/src/main/java/com/demo/repository/SpecialtyRepository.java",
+    "/projects/modernized/src/main/java/com/demo/repository/VisitRepository.java",
+    "/projects/modernized/src/main/java/com/demo/repository/UserRepository.java",
+    "/projects/modernized/pom.xml"
+  ],
+  "exit_criteria": [
+    {
+      "check": "quarkus_compile",
+      "cmd": "export JAVA_HOME=\"${JAVA_HOME_21}\" && export PATH=\"${JAVA_HOME}/bin:${PATH}\" && mvn -q clean compile",
+      "expect": "rc=0"
+    },
+    {
+      "check": "create_fk",
+      "assert": "Panache repositories correctly handle foreign key relationships",
+      "cmd": "grep -R -l -E \"ManyToOne|OneToMany|JoinColumn|CascadeType\" src/main/java 2>/dev/null | head -1 | grep -q .",
+      "expect": "rc=0"
+    },
+    {
+      "check": "http_semantics",
+      "assert": "Repository queries return correct data shapes",
+      "cmd": "test -d src/main/java && grep -R -l -E \"@Path|ExceptionMapper|ResponseStatus|@ApplicationPath|/q/health\" src/main/java pom.xml src/main/resources 2>/dev/null | head -1 | grep -q .",
+      "expect": "rc=0"
+    },
+    {
+      "check": "exception_mapping",
+      "assert": "Repository exceptions map to proper HTTP responses",
+      "cmd": "grep -R -l -E \"ExceptionMapper|ResponseStatusException|@ServerExceptionMapper\" src/main/java 2>/dev/null | head -1 | grep -q .",
+      "expect": "rc=0"
+    }
+  ],
+  "rules": [
+    "springboot-jpa-to-quarkus-00000",
+    "persistence-to-quarkus-00010",
+    "transaction-to-quarkus-00003"
+  ],
+  "layer": "repo",
+  "dependencies": [],
+  "constraints": [
+    "FORBIDDEN API: do not use @IfBuildProfile (any profile). Required path: %profile config / build-time alternatives per skill_view references/di-config.md (Pre-v12 R5 / Architect E-20260811T102405Z). Silent adoption after quoting this forbid = execute-as-defined FAIL/abort.",
+    "WRITE-SET (AR-4.4): write only files_writable / destination write-set. Readable deps and OOS paths are not write authority. Silent OOS writes = FAIL/abort.",
+    "COVERAGE-GAP: orphan model/interface / missing dependency owner \u21d2 typed needs_input BLOCK (escalate Lead) \u2014 NEVER OOS-invent types or owners.",
+    "RESIDUE: do not leave Spring/javax migration residue in files_writable that the story claims to migrate; unfinished in-scope residue \u21d2 typed needs_input, not kanban_complete.",
+    "CORS_OUT_OF_SCOPE (HARD / tip-bank B2): do NOT implement @CrossOrigin, CORS filters, or CORS essays. CORS is platform/infra \u2014 write REST resources first; typed needs_input if blocked, never thrash on CORS."
+  ]
+}

@@ -1,20 +1,20 @@
 {
-  "task_id": "t_b46de460",
+  "task_id": "t_e299181a",
   "role": "implementing",
   "phase": "M3",
   "identity": {
-    "story_id": "S-001",
+    "story_id": "S-012",
     "transform_class": "CONFIG",
     "g2_applicability": "not_applicable",
-    "operand_count": 2,
+    "operand_count": 3,
     "sizing_basis": "operand_count",
     "operand_class": "build_config"
   },
   "refs": [
     {
       "key": "brief_identity_ack",
-      "path": "evidence/acks/brief-identity-S-001.ack.yaml",
-      "sha256": "db8f8bf11b5bd3fb737d1f483fc8accd5ffcff30173757a39cadeff615a0dc76"
+      "path": "evidence/acks/brief-identity-S-012.ack.yaml",
+      "sha256": "735d3156c2baa1adc8cea79d854eb38bc29453d0c9091cc00782cc21d24b8d9b"
     },
     {
       "key": "legacy_locus",
@@ -23,16 +23,21 @@
     },
     {
       "key": "destination_inventory",
-      "path": "evidence/receipts/destination-inventory/S-001.json",
-      "sha256": "1965f8fb781d78e507a5651c504841f0736427a6f25640fb232b889ba8464a5d"
+      "path": "evidence/receipts/destination-inventory/S-012.json",
+      "sha256": "b80a3b2779d0f1031a163143273cc1b8f96cde92ccfc3571dddd25034c0f0839"
     }
   ],
   "files_in_scope": [
-    "pom.xml",
+    "src/main/java/org/springframework/samples/petclinic/service/ClinicServiceImpl.java",
+    "/projects/modernized/src/main/java/com/demo/service/ClinicServiceImpl.java",
+    "src/main/resources/application.properties",
+    "/projects/modernized/src/main/resources/application.properties",
     "/projects/modernized/pom.xml",
     "/projects/.derived/legacy-at-3/pom.xml"
   ],
   "files_writable": [
+    "/projects/modernized/src/main/java/com/demo/service/ClinicServiceImpl.java",
+    "/projects/modernized/src/main/resources/application.properties",
     "/projects/modernized/pom.xml"
   ],
   "exit_criteria": [
@@ -42,23 +47,21 @@
       "expect": "rc=0"
     },
     {
-      "check": "pom_quarkus_bom",
-      "cmd": "grep -E 'quarkus-bom|quarkus-universe-bom' pom.xml | head -1 | grep -q .",
+      "check": "http_semantics",
+      "cmd": "grep -E 'quarkus-cache|@CacheResult|quarkus.cache|devservices' pom.xml src/main/resources/application.properties src/main/java/com/demo/service/ClinicServiceImpl.java 2>/dev/null | head -1 | grep -q .",
       "expect": "rc=0",
-      "assert": "POM imports a Quarkus BOM"
+      "assert": "Cache extension/annotation or Dev Services config present"
     }
   ],
   "rules": [
-    "javaee-pom-to-quarkus-00010",
-    "javaee-pom-to-quarkus-00020",
-    "javaee-pom-to-quarkus-00030",
-    "javaee-pom-to-quarkus-00040",
-    "javaee-pom-to-quarkus-00050",
-    "javaee-pom-to-quarkus-00060",
-    "springboot-parent-pom-to-quarkus-00000",
-    "springboot-plugins-to-quarkus-0000"
+    "springboot-cache-to-quarkus-00000",
+    "springboot-devservices-to-quarkus-00000"
   ],
   "layer": "foundation",
+  "sequence_after": [
+    "S-005",
+    "S-002"
+  ],
   "dependencies": [],
   "constraints": [
     "FORBIDDEN API: do not use @IfBuildProfile (any profile). Required path: %profile config / build-time alternatives per skill_view references/di-config.md (Pre-v12 R5 / Architect E-20260811T102405Z). Silent adoption after quoting this forbid = execute-as-defined FAIL/abort.",

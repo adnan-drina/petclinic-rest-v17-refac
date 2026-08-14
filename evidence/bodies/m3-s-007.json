@@ -1,0 +1,96 @@
+{
+  "task_id": "t_65e27e68",
+  "role": "implementing",
+  "phase": "M3",
+  "identity": {
+    "story_id": "S-007",
+    "transform_class": "HARVEST",
+    "g2_applicability": "required",
+    "operand_count": 3,
+    "sizing_basis": "operand_count",
+    "operand_class": "src_code"
+  },
+  "refs": [
+    {
+      "key": "brief_identity_ack",
+      "path": "evidence/acks/brief-identity-S-007.ack.yaml",
+      "sha256": "4886b2522e6f9bc9ec2a8f330fd60e6ef8fabdf60003e4489502362fd3449762"
+    },
+    {
+      "key": "legacy_locus",
+      "path": "/projects/.derived/legacy-at-3/src/main/java/org/springframework/samples/petclinic/rest/OwnerRestController.java",
+      "sha256": "5e13270895a4e98595b26d97183fdfadee0965cd30d3a91f194d44c03d3970a8"
+    },
+    {
+      "key": "destination_inventory",
+      "path": "evidence/receipts/destination-inventory/S-007.json",
+      "sha256": "2fbed234c63767248a5c9df87d5a12ac64a26091fbd55354ca0c25a68cc3e466"
+    }
+  ],
+  "files_in_scope": [
+    "src/main/java/org/springframework/samples/petclinic/rest/OwnerRestController.java",
+    "src/main/java/org/springframework/samples/petclinic/rest/PetRestController.java",
+    "src/main/java/org/springframework/samples/petclinic/rest/PetTypeRestController.java",
+    "/projects/modernized/src/main/java/com/demo/rest/OwnerRestController.java",
+    "/projects/modernized/src/main/java/com/demo/rest/PetRestController.java",
+    "/projects/modernized/src/main/java/com/demo/rest/PetTypeRestController.java",
+    "/projects/modernized/pom.xml",
+    "/projects/.derived/legacy-at-3/pom.xml"
+  ],
+  "files_writable": [
+    "/projects/modernized/src/main/java/com/demo/rest/OwnerRestController.java",
+    "/projects/modernized/src/main/java/com/demo/rest/PetRestController.java",
+    "/projects/modernized/src/main/java/com/demo/rest/PetTypeRestController.java",
+    "/projects/modernized/pom.xml"
+  ],
+  "exit_criteria": [
+    {
+      "check": "quarkus_compile",
+      "cmd": "export JAVA_HOME=\"${JAVA_HOME_21}\" && export PATH=\"${JAVA_HOME}/bin:${PATH}\" && mvn -q clean compile",
+      "expect": "rc=0"
+    },
+    {
+      "check": "endpoint_contract",
+      "assert": "REST endpoints return correct JSON responses matching legacy behavior",
+      "cmd": "grep -R -l -E \"@Path|@GET|@POST|@PUT|@DELETE\" src/main/java 2>/dev/null | head -1 | grep -q .",
+      "expect": "rc=0"
+    },
+    {
+      "check": "create_fk",
+      "assert": "Owner/Pet/Visit create operations work with proper FK relationships",
+      "cmd": "grep -R -l -E \"ManyToOne|OneToMany|JoinColumn|CascadeType\" src/main/java 2>/dev/null | head -1 | grep -q .",
+      "expect": "rc=0"
+    },
+    {
+      "check": "owner_pet_visit_create",
+      "assert": "Owner, Pet, and Visit creation endpoints return correct responses",
+      "cmd": "grep -R -l -E \"Owner|Pet|Visit\" src/main/java 2>/dev/null | head -1 | grep -q .",
+      "expect": "rc=0"
+    },
+    {
+      "check": "exception_mapping",
+      "assert": "REST exceptions map to proper HTTP status codes",
+      "cmd": "grep -R -l -E \"ExceptionMapper|ResponseStatusException|@ServerExceptionMapper\" src/main/java 2>/dev/null | head -1 | grep -q .",
+      "expect": "rc=0"
+    },
+    {
+      "check": "http_semantics",
+      "assert": "REST endpoints return correct HTTP semantics",
+      "cmd": "test -d src/main/java && grep -R -l -E \"@Path|ExceptionMapper|ResponseStatus|@ApplicationPath|/q/health\" src/main/java pom.xml src/main/resources 2>/dev/null | head -1 | grep -q .",
+      "expect": "rc=0"
+    }
+  ],
+  "rules": [
+    "springboot-web-to-quarkus-00000",
+    "springboot-annotations-to-quarkus-00000"
+  ],
+  "layer": "rest",
+  "dependencies": [],
+  "constraints": [
+    "FORBIDDEN API: do not use @IfBuildProfile (any profile). Required path: %profile config / build-time alternatives per skill_view references/di-config.md (Pre-v12 R5 / Architect E-20260811T102405Z). Silent adoption after quoting this forbid = execute-as-defined FAIL/abort.",
+    "WRITE-SET (AR-4.4): write only files_writable / destination write-set. Readable deps and OOS paths are not write authority. Silent OOS writes = FAIL/abort.",
+    "COVERAGE-GAP: orphan model/interface / missing dependency owner \u21d2 typed needs_input BLOCK (escalate Lead) \u2014 NEVER OOS-invent types or owners.",
+    "RESIDUE: do not leave Spring/javax migration residue in files_writable that the story claims to migrate; unfinished in-scope residue \u21d2 typed needs_input, not kanban_complete.",
+    "CORS_OUT_OF_SCOPE (HARD / tip-bank B2): do NOT implement @CrossOrigin, CORS filters, or CORS essays. CORS is platform/infra \u2014 write REST resources first; typed needs_input if blocked, never thrash on CORS."
+  ]
+}

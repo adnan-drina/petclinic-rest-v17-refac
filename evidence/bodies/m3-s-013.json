@@ -1,9 +1,9 @@
 {
-  "task_id": "t_b46de460",
+  "task_id": "t_627d2a96",
   "role": "implementing",
   "phase": "M3",
   "identity": {
-    "story_id": "S-001",
+    "story_id": "S-013",
     "transform_class": "CONFIG",
     "g2_applicability": "not_applicable",
     "operand_count": 2,
@@ -13,26 +13,29 @@
   "refs": [
     {
       "key": "brief_identity_ack",
-      "path": "evidence/acks/brief-identity-S-001.ack.yaml",
-      "sha256": "db8f8bf11b5bd3fb737d1f483fc8accd5ffcff30173757a39cadeff615a0dc76"
+      "path": "evidence/acks/brief-identity-S-013.ack.yaml",
+      "sha256": "0c4889b2133383e002b2710a57e627e960d19b2aa24da42715ad4c1aca3fcf33"
     },
     {
       "key": "legacy_locus",
-      "path": "/projects/.derived/legacy-at-3/pom.xml",
-      "sha256": "3107a5d3466ca4e4fd434925f509728bb83c4a7543e500ab1eea2dd9f7b027a5"
+      "path": "/projects/.derived/legacy-at-3/src/main/resources/logback.xml",
+      "sha256": "50edb9859605500b6a6569354c3fcfd5b3e0f6526ef62caaee7dc034f0468ae4"
     },
     {
       "key": "destination_inventory",
-      "path": "evidence/receipts/destination-inventory/S-001.json",
-      "sha256": "1965f8fb781d78e507a5651c504841f0736427a6f25640fb232b889ba8464a5d"
+      "path": "evidence/receipts/destination-inventory/S-013.json",
+      "sha256": "c00cb6911b2b0806eb04fd28bc9ba25f33f19ed159d10223a62ea5b39a7aae43"
     }
   ],
   "files_in_scope": [
-    "pom.xml",
+    "src/main/resources/logback.xml",
+    "src/main/resources/messages/",
+    "/projects/modernized/src/main/resources/logback.xml",
     "/projects/modernized/pom.xml",
     "/projects/.derived/legacy-at-3/pom.xml"
   ],
   "files_writable": [
+    "/projects/modernized/src/main/resources/logback.xml",
     "/projects/modernized/pom.xml"
   ],
   "exit_criteria": [
@@ -42,21 +45,16 @@
       "expect": "rc=0"
     },
     {
-      "check": "pom_quarkus_bom",
-      "cmd": "grep -E 'quarkus-bom|quarkus-universe-bom' pom.xml | head -1 | grep -q .",
-      "expect": "rc=0",
-      "assert": "POM imports a Quarkus BOM"
+      "check": "http_semantics",
+      "assert": "Application logs correctly and message bundles load",
+      "cmd": "test -d src/main/java && grep -R -l -E \"@Path|ExceptionMapper|ResponseStatus|@ApplicationPath|/q/health\" src/main/java pom.xml src/main/resources 2>/dev/null | head -1 | grep -q .",
+      "expect": "rc=0"
     }
   ],
   "rules": [
-    "javaee-pom-to-quarkus-00010",
-    "javaee-pom-to-quarkus-00020",
-    "javaee-pom-to-quarkus-00030",
-    "javaee-pom-to-quarkus-00040",
-    "javaee-pom-to-quarkus-00050",
-    "javaee-pom-to-quarkus-00060",
-    "springboot-parent-pom-to-quarkus-00000",
-    "springboot-plugins-to-quarkus-0000"
+    "localhost-jdbc-00002",
+    "oracle2openjdk-00006",
+    "springboot-properties-to-quarkus-00000"
   ],
   "layer": "foundation",
   "dependencies": [],

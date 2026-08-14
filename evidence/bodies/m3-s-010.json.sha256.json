@@ -1,0 +1,6 @@
+{
+  "schema": "rhoai3.body-digest/v1",
+  "task_id": "t_4dfba74f",
+  "body_path": "evidence/bodies/m3-s-010.json",
+  "body_sha256": "2660edd7b16439bac0902b1056fb233122ecd2c6a9ea9974aea1c8473d25431b"
+}
